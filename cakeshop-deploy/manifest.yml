@@ -1,0 +1,16 @@
+---
+applications:
+- name: bmm-cakeshop
+  memory: 4GB
+  disk: 4GB
+  random-route: true
+  path: cakeshop.war
+  timeout: 180
+  health-check-type: process
+- name: bmm-cakeshop2
+  memory: 4GB
+  disk: 4GB
+  random-route: true
+  path: cakeshop.war
+  timeout: 180
+  health-check-type: process

@@ -1,0 +1,48 @@
+resources:
+- name: quorum-git
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/jpmorganchase/quorum.git
+- name: constellation-git
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/jpmorganchase/constellation.git
+- name: quorum-examples-git
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/jpmorganchase/quorum-examples.git
+- name: quorum-pipeline-git
+  type: git
+  source:
+    branch: wip
+    uri: {{pipeline_repo_url}}
+- name: cf-push
+  type: cf
+  source:
+    api: {{cf_api_url}}
+    username: {{cf_username}}
+    password: {{cf_password}}
+    organization: {{cf_org}}
+    space: {{cf_space}}
+    skip_cert_check: true
+jobs:
+- name: quorum-build-and-deploy
+  plan:
+  - aggregate:
+    - get: quorum-pipeline-git
+    - get: quorum-git
+    - get: constellation-git
+    - get: quorum-examples-git
+  - task: build-quorum
+    file: quorum-pipeline-git/tasks/build-quorum-task.yml
+  - task: build-constellation
+    file: quorum-pipeline-git/tasks/build-constellation-task.yml
+  - task: build-nodes
+    file: quorum-pipeline-git/tasks/build-nodes-task.yml
+  - put: cf-push
+    params:
+      manifest: build-nodes-output/manifest.yml
+      path: build-nodes-output/
